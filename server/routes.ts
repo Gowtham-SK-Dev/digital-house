@@ -293,11 +293,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/messages/:otherUserId', isAuthenticated, async (req: any, res) => {
+  app.get('/api/messages', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const { otherUserId } = req.params;
-      const messages = await storage.getUserMessages(userId, otherUserId);
+      const messages = await storage.getUserMessages(userId);
       res.json({ data: messages });
     } catch (error) {
       console.error("Error fetching messages:", error);
@@ -534,6 +533,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting announcement:", error);
       res.status(500).json({ message: "Failed to delete announcement" });
+    }
+  });
+
+  // Messages routes
+  app.get('/api/messages', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const messages = await storage.getUserMessages(userId);
+      res.json({ data: messages });
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      res.status(500).json({ message: "Failed to fetch messages" });
+    }
+  });
+
+  app.post('/api/messages', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const validation = insertMessageSchema.safeParse({ ...req.body, senderId: userId });
+      
+      if (!validation.success) {
+        return res.status(400).json({ message: "Invalid message data", errors: validation.error.issues });
+      }
+
+      const message = await storage.sendMessage(validation.data);
+      res.json({ data: message, message: "Message sent successfully" });
+    } catch (error) {
+      console.error("Error sending message:", error);
+      res.status(500).json({ message: "Failed to send message" });
+    }
+  });
+
+  app.put('/api/messages/:messageId/read', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { messageId } = req.params;
+      await storage.markMessageAsRead(messageId, userId);
+      res.json({ message: "Message marked as read" });
+    } catch (error) {
+      console.error("Error marking message as read:", error);
+      res.status(500).json({ message: "Failed to mark message as read" });
     }
   });
 

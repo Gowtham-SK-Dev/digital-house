@@ -15,6 +15,7 @@ import Jobs from "@/pages/jobs";
 import BusinessHub from "@/pages/business-hub";
 import VersionSelector from "@/pages/version-selector";
 import Announcements from "@/pages/announcements";
+import Messages from "@/pages/messages";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
 
@@ -44,6 +45,7 @@ function Router() {
           <Route path="/events" component={Events} />
           <Route path="/help-desk" component={HelpDesk} />
           <Route path="/announcements" component={Announcements} />
+          <Route path="/messages" component={Messages} />
           
           {/* Version 2.0 Features - Always available but show different content based on version */}
           <Route path="/matrimony" component={Matrimony} />

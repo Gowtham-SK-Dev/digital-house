@@ -37,6 +37,7 @@ export default function Header() {
     { href: "/events", label: "Events" },
     { href: "/help-desk", label: "Help Desk" },
     { href: "/announcements", label: "Announcements" },
+    { href: "/messages", label: "Messages" },
   ];
 
   const v2NavItems = [

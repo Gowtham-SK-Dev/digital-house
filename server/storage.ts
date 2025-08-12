@@ -77,8 +77,8 @@ export interface IStorage {
   
   // Messages operations
   sendMessage(message: InsertMessage): Promise<Message>;
-  getUserMessages(userId: string, otherUserId: string): Promise<Message[]>;
-  markMessageAsRead(messageId: string): Promise<void>;
+  getUserMessages(userId: string): Promise<Message[]>;
+  markMessageAsRead(messageId: string, userId: string): Promise<void>;
   
   // Version 2.0 - Matrimony operations
   getMatrimonyProfiles(): Promise<MatrimonyProfile[]>;
@@ -423,7 +423,7 @@ export class DatabaseStorage implements IStorage {
     return newMessage;
   }
 
-  async getUserMessages(userId: string, otherUserId: string): Promise<Message[]> {
+  async getUserMessages(userId: string): Promise<Message[]> {
     return await db
       .select({
         id: messages.id,
@@ -433,24 +433,29 @@ export class DatabaseStorage implements IStorage {
         isRead: messages.isRead,
         createdAt: messages.createdAt,
         sender: {
-          id: users.id,
           firstName: users.firstName,
           lastName: users.lastName,
           profileImageUrl: users.profileImageUrl,
+        },
+        receiver: {
+          firstName: sql<string>`receiver.first_name`,
+          lastName: sql<string>`receiver.last_name`,
+          profileImageUrl: sql<string>`receiver.profile_image_url`,
         }
       })
       .from(messages)
       .leftJoin(users, eq(messages.senderId, users.id))
+      .leftJoin(sql`users AS receiver`, sql`messages.receiver_id = receiver.id`)
       .where(
         or(
-          and(eq(messages.senderId, userId), eq(messages.receiverId, otherUserId)),
-          and(eq(messages.senderId, otherUserId), eq(messages.receiverId, userId))
+          eq(messages.senderId, userId),
+          eq(messages.receiverId, userId)
         )
       )
-      .orderBy(messages.createdAt);
+      .orderBy(desc(messages.createdAt));
   }
 
-  async markMessageAsRead(messageId: string): Promise<void> {
+  async markMessageAsRead(messageId: string, userId: string): Promise<void> {
     await db
       .update(messages)
       .set({ isRead: true })
