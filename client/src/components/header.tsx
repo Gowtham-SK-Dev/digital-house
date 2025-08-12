@@ -54,25 +54,26 @@ export default function Header() {
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+      <div className="max-w-[1400px] mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
+        <div className="flex justify-between items-center h-14 sm:h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2" data-testid="link-home">
-            <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-accent-500 rounded-lg flex items-center justify-center">
-              <Home className="text-white" size={16} />
+          <Link href="/" className="flex items-center space-x-2 flex-shrink-0" data-testid="link-home">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-primary-500 to-accent-500 rounded-lg flex items-center justify-center">
+              <Home className="text-white" size={14} />
             </div>
-            <span className="text-xl font-bold text-gray-900">Digital House</span>
+            <span className="text-lg sm:text-xl font-bold text-gray-900 hidden xs:block">Digital House</span>
+            <span className="text-sm font-bold text-gray-900 xs:hidden">DH</span>
           </Link>
           
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-4 lg:space-x-6 xl:space-x-8">
             {navItems.map((item) => {
               const isActive = location === item.href;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`text-sm font-medium transition-colors hover:text-primary-600 ${
+                  className={`text-xs lg:text-sm font-medium transition-colors hover:text-primary-600 whitespace-nowrap ${
                     isActive ? 'text-primary-600' : 'text-gray-600'
                   }`}
                   data-testid={`nav-${item.label.toLowerCase().replace(' ', '-')}`}
@@ -84,11 +85,11 @@ export default function Header() {
           </nav>
 
           {/* Right Side Actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
             {/* Notifications */}
-            <Button variant="ghost" size="sm" className="relative" data-testid="button-notifications">
-              <Bell size={18} />
-              <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">
+            <Button variant="ghost" size="sm" className="relative p-2" data-testid="button-notifications">
+              <Bell size={16} className="sm:w-[18px] sm:h-[18px]" />
+              <span className="absolute -top-1 -right-1 h-4 w-4 sm:h-5 sm:w-5 bg-red-500 rounded-full text-[10px] sm:text-xs text-white flex items-center justify-center">
                 2
               </span>
             </Button>
@@ -96,10 +97,10 @@ export default function Header() {
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full" data-testid="button-user-menu">
-                  <Avatar className="h-8 w-8">
+                <Button variant="ghost" className="relative h-7 w-7 sm:h-8 sm:w-8 rounded-full p-0" data-testid="button-user-menu">
+                  <Avatar className="h-7 w-7 sm:h-8 sm:w-8">
                     <AvatarImage src={user?.profileImageUrl || ""} alt={`${user?.firstName} ${user?.lastName}`} />
-                    <AvatarFallback className="bg-primary-500 text-white text-sm">
+                    <AvatarFallback className="bg-primary-500 text-white text-xs sm:text-sm">
                       {(user?.firstName?.[0] || "") + (user?.lastName?.[0] || "")}
                     </AvatarFallback>
                   </Avatar>

@@ -122,6 +122,48 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
+    /* Optimize for different zoom levels */
+    min-width: 320px;
+  }
+
+  /* Custom responsive breakpoint for extra small screens */
+  @media (min-width: 375px) {
+    .xs\:block {
+      display: block;
+    }
+    .xs\:hidden {
+      display: none;
+    }
+  }
+
+  /* Optimize text rendering for different zoom levels */
+  html {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Ensure proper scaling for zoom levels */
+  @media (max-width: 1200px) {
+    .container {
+      max-width: 90%;
+    }
+  }
+
+  /* Optimized layout for 80% zoom */
+  @media (min-width: 1200px) {
+    .max-w-7xl {
+      max-width: 88rem; /* Slightly larger max-width for better 80% zoom appearance */
+    }
+    .max-w-\[1400px\] {
+      max-width: 1500px; /* Optimized for 80% zoom */
+    }
+  }
+
+  /* Better font rendering at different zoom levels */
+  h1, h2, h3, h4, h5, h6 {
+    font-feature-settings: "kern" 1, "liga" 1;
+    text-rendering: optimizeLegibility;
   }
 }
 
