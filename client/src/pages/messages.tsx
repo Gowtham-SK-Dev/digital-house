@@ -61,13 +61,14 @@ export default function Messages() {
 
   const { data: usersResponse } = useQuery({
     queryKey: ["/api/users/search", searchQuery],
+    queryFn: () => fetch(`/api/users/search?q=${encodeURIComponent(searchQuery)}`).then(res => res.json()),
     enabled: searchQuery.length > 2,
   });
   
   const users = (usersResponse as any)?.data || [];
 
   // Group messages into conversations
-  const conversations: Conversation[] = messages.reduce((acc, message) => {
+  const conversations: Conversation[] = Array.isArray(messages) ? messages.reduce((acc, message) => {
     const partnerId = message.senderId === user?.id ? message.receiverId : message.senderId;
     const partner = message.senderId === user?.id ? message.receiver : message.sender;
     
@@ -91,7 +92,7 @@ export default function Messages() {
       });
     }
     return acc;
-  }, [] as Conversation[]);
+  }, [] as Conversation[]) : [];
 
   // Get messages for selected conversation
   const conversationMessages = selectedConversation 

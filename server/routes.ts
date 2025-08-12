@@ -591,6 +591,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   }
 
+  // User search route
+  app.get('/api/users/search', async (req, res) => {
+    try {
+      const { q } = req.query;
+      if (!q || typeof q !== 'string') {
+        return res.json({ data: [] });
+      }
+      const users = await storage.searchUsers(q, 20);
+      res.json({ data: users });
+    } catch (error) {
+      console.error("Error searching users:", error);
+      res.status(500).json({ message: "Failed to search users" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
