@@ -351,8 +351,8 @@ export default function Home() {
                   <div key={request.id} className="p-3 bg-orange-50 rounded-lg border border-orange-200">
                     <div className="flex items-start justify-between mb-2">
                       <h4 className="font-medium text-orange-900 text-sm line-clamp-1">{request.title}</h4>
-                      <Badge variant={request.urgencyLevel >= 4 ? "destructive" : "secondary"} className="text-xs">
-                        {request.urgencyLevel >= 4 ? "Urgent" : "Normal"}
+                      <Badge variant={(request.urgencyLevel || 1) >= 4 ? "destructive" : "secondary"} className="text-xs">
+                        {(request.urgencyLevel || 1) >= 4 ? "Urgent" : "Normal"}
                       </Badge>
                     </div>
                     <div className="flex items-center justify-between">
