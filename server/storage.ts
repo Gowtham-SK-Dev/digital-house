@@ -9,6 +9,11 @@ import {
   messages,
   postLikes,
   postComments,
+  matrimonyProfiles,
+  jobs,
+  businesses,
+  jobApplications,
+  matrimonyInterests,
   type User,
   type UpsertUser,
   type Post,
@@ -21,6 +26,12 @@ import {
   type InsertHelpRequest,
   type Message,
   type InsertMessage,
+  type MatrimonyProfile,
+  type InsertMatrimonyProfile,
+  type Job,
+  type InsertJob,
+  type Business,
+  type InsertBusiness,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, or, like, sql, count } from "drizzle-orm";
@@ -65,6 +76,24 @@ export interface IStorage {
   sendMessage(message: InsertMessage): Promise<Message>;
   getUserMessages(userId: string, otherUserId: string): Promise<Message[]>;
   markMessageAsRead(messageId: string): Promise<void>;
+  
+  // Version 2.0 - Matrimony operations
+  getMatrimonyProfiles(): Promise<MatrimonyProfile[]>;
+  getMatrimonyProfile(userId: string): Promise<MatrimonyProfile | undefined>;
+  createMatrimonyProfile(profile: InsertMatrimonyProfile): Promise<MatrimonyProfile>;
+  expressMatrimonyInterest(fromUserId: string, toUserId: string, message: string): Promise<void>;
+  
+  // Version 2.0 - Jobs operations
+  getJobs(): Promise<Job[]>;
+  createJob(job: InsertJob): Promise<Job>;
+  applyToJob(jobId: string, applicantId: string, coverLetter: string): Promise<void>;
+  getUserJobApplications(userId: string): Promise<any[]>;
+  
+  // Version 2.0 - Business operations
+  getBusinesses(): Promise<Business[]>;
+  getBusinessCategories(): Promise<string[]>;
+  createBusiness(business: InsertBusiness): Promise<Business>;
+  contactBusiness(businessId: string, userId: string, message: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -416,6 +445,197 @@ export class DatabaseStorage implements IStorage {
       .update(messages)
       .set({ isRead: true })
       .where(eq(messages.id, messageId));
+  }
+
+  // Version 2.0 - Matrimony operations
+  async getMatrimonyProfiles(): Promise<MatrimonyProfile[]> {
+    const profiles = await db
+      .select({
+        id: matrimonyProfiles.id,
+        userId: matrimonyProfiles.userId,
+        age: matrimonyProfiles.age,
+        height: matrimonyProfiles.height,
+        education: matrimonyProfiles.education,
+        interests: matrimonyProfiles.interests,
+        lookingFor: matrimonyProfiles.lookingFor,
+        isActive: matrimonyProfiles.isActive,
+        createdAt: matrimonyProfiles.createdAt,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        profileImageUrl: users.profileImageUrl,
+        location: users.location,
+        nativePlace: users.nativePlace,
+        kulam: users.kulam,
+        natchathiram: users.natchathiram,
+        occupation: users.occupation,
+      })
+      .from(matrimonyProfiles)
+      .innerJoin(users, eq(matrimonyProfiles.userId, users.id))
+      .where(eq(matrimonyProfiles.isActive, true));
+    
+    return profiles as any[];
+  }
+
+  async getMatrimonyProfile(userId: string): Promise<MatrimonyProfile | undefined> {
+    const [profile] = await db
+      .select()
+      .from(matrimonyProfiles)
+      .where(eq(matrimonyProfiles.userId, userId));
+    return profile;
+  }
+
+  async createMatrimonyProfile(profile: InsertMatrimonyProfile): Promise<MatrimonyProfile> {
+    const [newProfile] = await db
+      .insert(matrimonyProfiles)
+      .values(profile)
+      .returning();
+    return newProfile;
+  }
+
+  async expressMatrimonyInterest(fromUserId: string, toUserId: string, message: string): Promise<void> {
+    await db.insert(matrimonyInterests).values({
+      fromUserId,
+      toUserId,
+      message,
+      status: 'pending',
+    });
+  }
+
+  // Version 2.0 - Jobs operations
+  async getJobs(): Promise<Job[]> {
+    const jobsList = await db
+      .select({
+        id: jobs.id,
+        title: jobs.title,
+        company: jobs.company,
+        companyLogo: jobs.companyLogo,
+        description: jobs.description,
+        location: jobs.location,
+        type: jobs.type,
+        experienceLevel: jobs.experienceLevel,
+        salaryRange: jobs.salaryRange,
+        skills: jobs.skills,
+        benefits: jobs.benefits,
+        postedById: jobs.postedById,
+        applicationsCount: jobs.applicationsCount,
+        isUrgent: jobs.isUrgent,
+        isRemote: jobs.isRemote,
+        createdAt: jobs.createdAt,
+        postedBy: {
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImageUrl: users.profileImageUrl,
+        }
+      })
+      .from(jobs)
+      .innerJoin(users, eq(jobs.postedById, users.id))
+      .orderBy(desc(jobs.createdAt));
+    
+    return jobsList as any[];
+  }
+
+  async createJob(job: InsertJob): Promise<Job> {
+    const [newJob] = await db
+      .insert(jobs)
+      .values(job)
+      .returning();
+    return newJob;
+  }
+
+  async applyToJob(jobId: string, applicantId: string, coverLetter: string): Promise<void> {
+    await db.insert(jobApplications).values({
+      jobId,
+      applicantId,
+      coverLetter,
+      status: 'pending',
+    });
+
+    // Increment applications count
+    await db
+      .update(jobs)
+      .set({ 
+        applicationsCount: sql`${jobs.applicationsCount} + 1`
+      })
+      .where(eq(jobs.id, jobId));
+  }
+
+  async getUserJobApplications(userId: string): Promise<any[]> {
+    const applications = await db
+      .select()
+      .from(jobApplications)
+      .where(eq(jobApplications.applicantId, userId))
+      .orderBy(desc(jobApplications.createdAt));
+    
+    return applications;
+  }
+
+  // Version 2.0 - Business operations
+  async getBusinesses(): Promise<Business[]> {
+    const businessList = await db
+      .select({
+        id: businesses.id,
+        ownerId: businesses.ownerId,
+        businessName: businesses.businessName,
+        businessLogo: businesses.businessLogo,
+        category: businesses.category,
+        description: businesses.description,
+        location: businesses.location,
+        website: businesses.website,
+        phone: businesses.phone,
+        email: businesses.email,
+        services: businesses.services,
+        yearEstablished: businesses.yearEstablished,
+        employeeCount: businesses.employeeCount,
+        rating: businesses.rating,
+        reviewsCount: businesses.reviewsCount,
+        isVerified: businesses.isVerified,
+        isFeatured: businesses.isFeatured,
+        socialMedia: businesses.socialMedia,
+        createdAt: businesses.createdAt,
+        owner: {
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImageUrl: users.profileImageUrl,
+        }
+      })
+      .from(businesses)
+      .innerJoin(users, eq(businesses.ownerId, users.id))
+      .orderBy(desc(businesses.isFeatured), desc(businesses.createdAt));
+    
+    return businessList as any[];
+  }
+
+  async getBusinessCategories(): Promise<string[]> {
+    const categories = await db
+      .selectDistinct({ category: businesses.category })
+      .from(businesses);
+    
+    return categories.map(c => c.category).filter(Boolean);
+  }
+
+  async createBusiness(business: InsertBusiness): Promise<Business> {
+    const [newBusiness] = await db
+      .insert(businesses)
+      .values(business)
+      .returning();
+    return newBusiness;
+  }
+
+  async contactBusiness(businessId: string, userId: string, message: string): Promise<void> {
+    // For now, we'll create a message entry. In a real app, this might send an email or notification
+    const business = await db
+      .select({ ownerId: businesses.ownerId })
+      .from(businesses)
+      .where(eq(businesses.id, businessId))
+      .limit(1);
+    
+    if (business[0]) {
+      await db.insert(messages).values({
+        senderId: userId,
+        receiverId: business[0].ownerId,
+        content: `Business Contact Request: ${message}`,
+      });
+    }
   }
 }
 

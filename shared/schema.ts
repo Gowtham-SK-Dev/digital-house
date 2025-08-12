@@ -275,6 +275,80 @@ export const messagesRelations = relations(messages, ({ one }) => ({
   }),
 }));
 
+// Version 2.0 Tables
+export const matrimonyProfiles = pgTable("matrimony_profiles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  age: integer("age").notNull(),
+  height: varchar("height"),
+  education: varchar("education"),
+  interests: varchar("interests").array(),
+  lookingFor: text("looking_for"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const jobs = pgTable("jobs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: varchar("title").notNull(),
+  company: varchar("company").notNull(),
+  companyLogo: varchar("company_logo"),
+  description: text("description").notNull(),
+  location: varchar("location").notNull(),
+  type: varchar("type").notNull(), // full-time, part-time, contract, remote
+  experienceLevel: varchar("experience_level").notNull(), // entry, mid, senior, executive
+  salaryRange: varchar("salary_range"),
+  skills: varchar("skills").array(),
+  benefits: varchar("benefits").array(),
+  postedById: varchar("posted_by_id").references(() => users.id).notNull(),
+  applicationsCount: integer("applications_count").default(0),
+  isUrgent: boolean("is_urgent").default(false),
+  isRemote: boolean("is_remote").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const jobApplications = pgTable("job_applications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  jobId: varchar("job_id").references(() => jobs.id).notNull(),
+  applicantId: varchar("applicant_id").references(() => users.id).notNull(),
+  status: varchar("status").default('pending').notNull(), // pending, reviewed, accepted, rejected
+  coverLetter: text("cover_letter"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const businesses = pgTable("businesses", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  ownerId: varchar("owner_id").references(() => users.id).notNull(),
+  businessName: varchar("business_name").notNull(),
+  businessLogo: varchar("business_logo"),
+  category: varchar("category").notNull(),
+  description: text("description").notNull(),
+  location: varchar("location").notNull(),
+  website: varchar("website"),
+  phone: varchar("phone"),
+  email: varchar("email"),
+  services: varchar("services").array(),
+  yearEstablished: integer("year_established"),
+  employeeCount: varchar("employee_count"),
+  rating: integer("rating").default(0),
+  reviewsCount: integer("reviews_count").default(0),
+  isVerified: boolean("is_verified").default(false),
+  isFeatured: boolean("is_featured").default(false),
+  socialMedia: jsonb("social_media"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const matrimonyInterests = pgTable("matrimony_interests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  fromUserId: varchar("from_user_id").references(() => users.id).notNull(),
+  toUserId: varchar("to_user_id").references(() => users.id).notNull(),
+  status: varchar("status").default('pending').notNull(), // pending, accepted, rejected
+  message: text("message"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -314,6 +388,26 @@ export const insertMessageSchema = createInsertSchema(messages).omit({
   createdAt: true,
 });
 
+export const insertMatrimonyProfileSchema = createInsertSchema(matrimonyProfiles).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertJobSchema = createInsertSchema(jobs).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  applicationsCount: true,
+});
+
+export const insertBusinessSchema = createInsertSchema(businesses).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  rating: true,
+  reviewsCount: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type UpsertUser = typeof users.$inferInsert;
@@ -328,3 +422,9 @@ export type HelpRequest = typeof helpRequests.$inferSelect;
 export type InsertHelpRequest = z.infer<typeof insertHelpRequestSchema>;
 export type Message = typeof messages.$inferSelect;
 export type InsertMessage = z.infer<typeof insertMessageSchema>;
+export type MatrimonyProfile = typeof matrimonyProfiles.$inferSelect;
+export type InsertMatrimonyProfile = z.infer<typeof insertMatrimonyProfileSchema>;
+export type Job = typeof jobs.$inferSelect;
+export type InsertJob = z.infer<typeof insertJobSchema>;
+export type Business = typeof businesses.$inferSelect;
+export type InsertBusiness = z.infer<typeof insertBusinessSchema>;

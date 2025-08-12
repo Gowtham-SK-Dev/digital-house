@@ -2,7 +2,16 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertPostSchema, insertConnectionSchema, insertEventSchema, insertHelpRequestSchema, insertMessageSchema } from "@shared/schema";
+import { 
+  insertPostSchema, 
+  insertConnectionSchema, 
+  insertEventSchema, 
+  insertHelpRequestSchema, 
+  insertMessageSchema,
+  insertMatrimonyProfileSchema,
+  insertJobSchema,
+  insertBusinessSchema
+} from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -292,6 +301,147 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching messages:", error);
       res.status(500).json({ message: "Failed to fetch messages" });
+    }
+  });
+
+  // Version 2.0 Routes - Matrimony
+  app.get('/api/matrimony/profiles', isAuthenticated, async (req, res) => {
+    try {
+      const profiles = await storage.getMatrimonyProfiles();
+      res.json({ data: profiles });
+    } catch (error) {
+      console.error("Error fetching matrimony profiles:", error);
+      res.status(500).json({ message: "Failed to fetch matrimony profiles" });
+    }
+  });
+
+  app.get('/api/matrimony/my-profile', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const profile = await storage.getMatrimonyProfile(userId);
+      res.json(profile);
+    } catch (error) {
+      console.error("Error fetching matrimony profile:", error);
+      res.status(500).json({ message: "Failed to fetch matrimony profile" });
+    }
+  });
+
+  app.post('/api/matrimony/profiles/:profileId/interest', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { profileId } = req.params;
+      const { message = '' } = req.body;
+      
+      await storage.expressMatrimonyInterest(userId, profileId, message);
+      res.json({ message: "Interest expressed successfully" });
+    } catch (error) {
+      console.error("Error expressing interest:", error);
+      res.status(500).json({ message: "Failed to express interest" });
+    }
+  });
+
+  // Version 2.0 Routes - Jobs
+  app.get('/api/jobs', isAuthenticated, async (req, res) => {
+    try {
+      const jobs = await storage.getJobs();
+      res.json({ data: jobs });
+    } catch (error) {
+      console.error("Error fetching jobs:", error);
+      res.status(500).json({ message: "Failed to fetch jobs" });
+    }
+  });
+
+  app.post('/api/jobs', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const validation = insertJobSchema.safeParse({ ...req.body, postedById: userId });
+      
+      if (!validation.success) {
+        return res.status(400).json({ message: "Invalid job data", errors: validation.error.issues });
+      }
+
+      const job = await storage.createJob(validation.data);
+      res.json({ data: job, message: "Job posted successfully" });
+    } catch (error) {
+      console.error("Error creating job:", error);
+      res.status(500).json({ message: "Failed to create job" });
+    }
+  });
+
+  app.post('/api/jobs/:jobId/apply', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { jobId } = req.params;
+      const { coverLetter = '' } = req.body;
+      
+      await storage.applyToJob(jobId, userId, coverLetter);
+      res.json({ message: "Application submitted successfully" });
+    } catch (error) {
+      console.error("Error applying to job:", error);
+      res.status(500).json({ message: "Failed to apply to job" });
+    }
+  });
+
+  app.get('/api/jobs/my-applications', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const applications = await storage.getUserJobApplications(userId);
+      res.json({ data: applications });
+    } catch (error) {
+      console.error("Error fetching job applications:", error);
+      res.status(500).json({ message: "Failed to fetch job applications" });
+    }
+  });
+
+  // Version 2.0 Routes - Business Hub
+  app.get('/api/businesses', isAuthenticated, async (req, res) => {
+    try {
+      const businesses = await storage.getBusinesses();
+      res.json({ data: businesses });
+    } catch (error) {
+      console.error("Error fetching businesses:", error);
+      res.status(500).json({ message: "Failed to fetch businesses" });
+    }
+  });
+
+  app.get('/api/businesses/categories', isAuthenticated, async (req, res) => {
+    try {
+      const categories = await storage.getBusinessCategories();
+      res.json({ data: categories });
+    } catch (error) {
+      console.error("Error fetching business categories:", error);
+      res.status(500).json({ message: "Failed to fetch business categories" });
+    }
+  });
+
+  app.post('/api/businesses', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const validation = insertBusinessSchema.safeParse({ ...req.body, ownerId: userId });
+      
+      if (!validation.success) {
+        return res.status(400).json({ message: "Invalid business data", errors: validation.error.issues });
+      }
+
+      const business = await storage.createBusiness(validation.data);
+      res.json({ data: business, message: "Business created successfully" });
+    } catch (error) {
+      console.error("Error creating business:", error);
+      res.status(500).json({ message: "Failed to create business" });
+    }
+  });
+
+  app.post('/api/businesses/:businessId/contact', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { businessId } = req.params;
+      const { message = '' } = req.body;
+      
+      await storage.contactBusiness(businessId, userId, message);
+      res.json({ message: "Contact request sent successfully" });
+    } catch (error) {
+      console.error("Error contacting business:", error);
+      res.status(500).json({ message: "Failed to contact business" });
     }
   });
 

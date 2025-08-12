@@ -2,9 +2,15 @@
 
 ## Overview
 
-Digital House is a community-based social networking platform designed to reconnect community members globally. The platform provides dedicated spaces for personal networking, business promotion, job opportunities, matrimony, and real-time help requests. It promotes cultural events, education, and entrepreneurship while enabling both social interactions and professional growth.
+Digital House is a comprehensive community-based social networking platform designed to reconnect Indian diaspora members globally. The platform now features two versions:
 
-The application is built as a full-stack TypeScript web application using modern development practices and follows a modular, domain-based architecture pattern.
+**Version 1.0** - Core community features including member networking, cultural events, emergency help system, and business connections.
+
+**Version 2.0** - Enhanced platform with AI-powered matrimony matching, comprehensive job portal, and advanced business networking hub alongside all original features.
+
+The application provides dedicated spaces for personal networking, business promotion, job opportunities, matrimony matching with cultural compatibility, and real-time help requests. It promotes cultural events, education, and entrepreneurship while enabling both social interactions and professional growth.
+
+The application is built as a full-stack TypeScript web application using modern development practices and follows a modular, domain-based architecture pattern with dual-version support.
 
 ## User Preferences
 
@@ -32,7 +38,9 @@ Preferred communication style: Simple, everyday language.
 - **Database**: PostgreSQL with connection pooling via Neon serverless
 - **Schema Management**: Drizzle Kit for migrations and schema management
 - **Schema Structure**: Normalized relational design with proper foreign key relationships
-- **Key Tables**: users, posts, connections, events, help_requests, messages with supporting tables for likes, comments, and RSVPs
+- **Key Tables**: 
+  - **V1.0**: users, posts, connections, events, help_requests, messages with supporting tables for likes, comments, and RSVPs
+  - **V2.0**: matrimony_profiles, jobs, job_applications, businesses, matrimony_interests for enhanced features
 
 ### Authentication & Authorization
 - **Primary Auth**: Replit OpenID Connect with passport.js strategy
@@ -87,3 +95,28 @@ Preferred communication style: Simple, everyday language.
 - **Zod**: TypeScript-first schema validation
 - **React Hook Form**: Performant forms library with minimal re-renders
 - **@hookform/resolvers**: Integration between React Hook Form and Zod validation
+
+## Version 2.0 Features
+
+### Enhanced Matrimony System
+- **Cultural Compatibility**: Matching based on Kulam, Natchathiram, and native place
+- **AI-Powered Matching**: Advanced algorithms for compatibility scoring
+- **Family Integration**: Support for family involvement in matrimony process
+- **Interest Management**: Express and manage matrimony interests with messaging
+
+### Comprehensive Job Portal
+- **Community-Verified Jobs**: Job postings from trusted community members
+- **Skill-Based Matching**: Advanced filtering by skills and experience
+- **Application Tracking**: Full application lifecycle management
+- **Company Profiles**: Detailed employer information and branding
+
+### Business Networking Hub
+- **Business Directory**: Comprehensive showcase of community businesses
+- **Category Management**: Organized business discovery by industry
+- **Verification System**: Community-verified business credentials
+- **Partnership Opportunities**: Connect businesses for collaboration
+
+### Version Selector
+- **Dual-Version Support**: Users can switch between V1.0 and V2.0 features
+- **Persistent Preferences**: Version selection stored in localStorage
+- **Dynamic Navigation**: Navigation adapts based on selected version

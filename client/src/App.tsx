@@ -10,13 +10,25 @@ import Profile from "@/pages/profile";
 import Members from "@/pages/members";
 import Events from "@/pages/events";
 import HelpDesk from "@/pages/help-desk";
+import Matrimony from "@/pages/matrimony";
+import Jobs from "@/pages/jobs";
+import BusinessHub from "@/pages/business-hub";
+import VersionSelector from "@/pages/version-selector";
 import { useAuth } from "@/hooks/useAuth";
+import { useEffect, useState } from "react";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
+  const [currentVersion, setCurrentVersion] = useState<string>('v1');
+
+  useEffect(() => {
+    const version = localStorage.getItem('digital-house-version') || 'v1';
+    setCurrentVersion(version);
+  }, []);
 
   return (
     <Switch>
+      <Route path="/version-selector" component={VersionSelector} />
       {isLoading || !isAuthenticated ? (
         <Route path="/" component={Landing} />
       ) : (
@@ -26,6 +38,15 @@ function Router() {
           <Route path="/members" component={Members} />
           <Route path="/events" component={Events} />
           <Route path="/help-desk" component={HelpDesk} />
+          
+          {/* Version 2.0 Features */}
+          {currentVersion === 'v2' && (
+            <>
+              <Route path="/matrimony" component={Matrimony} />
+              <Route path="/jobs" component={Jobs} />
+              <Route path="/business" component={BusinessHub} />
+            </>
+          )}
         </>
       )}
       <Route component={NotFound} />

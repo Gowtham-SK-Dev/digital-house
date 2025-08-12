@@ -29,12 +29,22 @@ export default function Header() {
     window.location.href = "/api/logout";
   };
 
-  const navItems = [
+  const currentVersion = localStorage.getItem('digital-house-version') || 'v1';
+  
+  const baseNavItems = [
     { href: "/", label: "Home", icon: Home },
     { href: "/members", label: "Members" },
     { href: "/events", label: "Events" },
     { href: "/help-desk", label: "Help Desk" },
   ];
+
+  const v2NavItems = [
+    { href: "/matrimony", label: "Matrimony" },
+    { href: "/jobs", label: "Jobs" },
+    { href: "/business-hub", label: "Business Hub" },
+  ];
+
+  const navItems = currentVersion === 'v2' ? [...baseNavItems, ...v2NavItems] : baseNavItems;
 
   if (!isAuthenticated) {
     return null;
@@ -114,6 +124,12 @@ export default function Header() {
                 <DropdownMenuItem data-testid="menu-settings">
                   <Settings className="mr-2 h-4 w-4" />
                   Settings
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/version-selector" className="cursor-pointer" data-testid="menu-version">
+                    <span className="mr-2 text-xs bg-gradient-to-r from-purple-500 to-blue-500 text-white px-1 py-0.5 rounded">v{currentVersion.slice(1)}</span>
+                    Switch Version
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} data-testid="menu-logout">
