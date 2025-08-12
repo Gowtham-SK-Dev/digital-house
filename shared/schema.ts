@@ -38,13 +38,20 @@ export const announcementPriorityEnum = pgEnum('announcement_priority', ['low', 
 
 // Users table
 export const users = pgTable("users", {
-  id: varchar("id").primaryKey(),
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   email: varchar("email").unique(),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
   role: userRoleEnum("role").default('individual').notNull(),
   userType: userTypeEnum("user_type").default('member').notNull(),
+  
+  // Authentication fields for custom auth
+  passwordHash: varchar("password_hash"), // For custom authentication
+  emailVerified: boolean("email_verified").default(false),
+  emailVerificationToken: varchar("email_verification_token"),
+  passwordResetToken: varchar("password_reset_token"),
+  passwordResetExpires: timestamp("password_reset_expires"),
   
   // Community-specific fields
   nativePlace: varchar("native_place"),

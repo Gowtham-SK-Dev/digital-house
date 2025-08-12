@@ -16,6 +16,10 @@ import BusinessHub from "@/pages/business-hub";
 import VersionSelector from "@/pages/version-selector";
 import Announcements from "@/pages/announcements";
 import Messages from "@/pages/messages";
+import Login from "@/pages/login";
+import Register from "@/pages/register";
+import ForgotPassword from "@/pages/forgot-password";
+import ResetPassword from "@/pages/reset-password";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
 
@@ -34,7 +38,13 @@ function Router() {
 
   return (
     <Switch>
+      {/* Public routes - available without authentication */}
       <Route path="/version-selector" component={VersionSelector} />
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
+      <Route path="/forgot-password" component={ForgotPassword} />
+      <Route path="/reset-password" component={ResetPassword} />
+      
       {!isAuthenticated ? (
         <Route path="/" component={Landing} />
       ) : (

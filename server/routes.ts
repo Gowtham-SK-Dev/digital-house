@@ -3,6 +3,17 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { 
+  hashPassword, 
+  comparePassword, 
+  generateToken, 
+  generateResetToken, 
+  generateVerificationToken,
+  requireAuth,
+  sendVerificationEmail,
+  sendPasswordResetEmail,
+  type AuthRequest
+} from "./customAuth";
+import { 
   insertPostSchema, 
   insertConnectionSchema, 
   insertEventSchema, 
@@ -19,12 +30,226 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
 
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  // Custom Authentication Routes
+  app.post('/api/auth/register', async (req, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
+      const { firstName, lastName, email, password, phoneNumber, location, nativePlace, kulam, natchathiram, occupation, role } = req.body;
+
+      // Validation
+      if (!firstName || !lastName || !email || !password) {
+        return res.status(400).json({ message: "First name, last name, email, and password are required" });
+      }
+
+      if (password.length < 8) {
+        return res.status(400).json({ message: "Password must be at least 8 characters long" });
+      }
+
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: "User with this email already exists" });
+      }
+
+      // Hash password and generate verification token
+      const passwordHash = await hashPassword(password);
+      const emailVerificationToken = generateVerificationToken();
+
+      // Create user
+      const userData = {
+        firstName,
+        lastName,
+        email,
+        passwordHash,
+        phoneNumber,
+        location,
+        nativePlace,
+        kulam,
+        natchathiram,
+        occupation,
+        role: role || 'individual',
+        emailVerificationToken,
+        emailVerified: false,
+      };
+
+      const user = await storage.createUserWithCustomAuth(userData);
+
+      // Send verification email
+      await sendVerificationEmail(email, emailVerificationToken, firstName);
+
+      res.status(201).json({ 
+        message: "User registered successfully. Please check your email to verify your account.",
+        userId: user.id 
+      });
+    } catch (error) {
+      console.error("Registration error:", error);
+      res.status(500).json({ message: "Registration failed" });
+    }
+  });
+
+  app.post('/api/auth/login', async (req, res) => {
+    try {
+      const { email, password, rememberMe } = req.body;
+
+      if (!email || !password) {
+        return res.status(400).json({ message: "Email and password are required" });
+      }
+
+      // Find user by email
+      const user = await storage.getUserByEmail(email);
+      if (!user || !user.passwordHash) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+
+      // Verify password
+      const isValidPassword = await comparePassword(password, user.passwordHash);
+      if (!isValidPassword) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+
+      // Generate JWT token
+      const token = generateToken(user.id);
+
+      // Set cookie
+      const cookieOptions = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: rememberMe ? 7 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000, // 7 days or 1 day
+        sameSite: 'strict' as const,
+      };
+
+      res.cookie('token', token, cookieOptions);
+
+      res.json({
+        message: "Login successful",
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          emailVerified: user.emailVerified,
+        },
+        token
+      });
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(500).json({ message: "Login failed" });
+    }
+  });
+
+  app.post('/api/auth/forgot-password', async (req, res) => {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        // Don't reveal if email exists or not for security
+        return res.json({ message: "If an account with that email exists, we've sent a password reset link." });
+      }
+
+      // Generate reset token
+      const resetToken = generateResetToken();
+      const resetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+      // Save reset token to user
+      await storage.setPasswordResetToken(user.id, resetToken, resetExpires);
+
+      // Send reset email
+      await sendPasswordResetEmail(email, resetToken, user.firstName || 'User');
+
+      res.json({ message: "If an account with that email exists, we've sent a password reset link." });
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      res.status(500).json({ message: "Failed to process password reset request" });
+    }
+  });
+
+  app.get('/api/auth/validate-reset-token', async (req, res) => {
+    try {
+      const { token } = req.query;
+
+      if (!token || typeof token !== 'string') {
+        return res.status(400).json({ message: "Reset token is required" });
+      }
+
+      const user = await storage.getUserByResetToken(token);
+      if (!user || !user.passwordResetExpires || new Date() > user.passwordResetExpires) {
+        return res.status(400).json({ message: "Invalid or expired reset token" });
+      }
+
+      res.json({ message: "Valid reset token" });
+    } catch (error) {
+      console.error("Validate reset token error:", error);
+      res.status(500).json({ message: "Failed to validate reset token" });
+    }
+  });
+
+  app.post('/api/auth/reset-password', async (req, res) => {
+    try {
+      const { token, password } = req.body;
+
+      if (!token || !password) {
+        return res.status(400).json({ message: "Token and new password are required" });
+      }
+
+      if (password.length < 8) {
+        return res.status(400).json({ message: "Password must be at least 8 characters long" });
+      }
+
+      const user = await storage.getUserByResetToken(token);
+      if (!user || !user.passwordResetExpires || new Date() > user.passwordResetExpires) {
+        return res.status(400).json({ message: "Invalid or expired reset token" });
+      }
+
+      // Hash new password
+      const passwordHash = await hashPassword(password);
+
+      // Update password and clear reset token
+      await storage.updateUserPassword(user.id, passwordHash);
+
+      res.json({ message: "Password reset successful" });
+    } catch (error) {
+      console.error("Reset password error:", error);
+      res.status(500).json({ message: "Failed to reset password" });
+    }
+  });
+
+  app.post('/api/auth/logout', (req, res) => {
+    res.clearCookie('token');
+    res.json({ message: "Logout successful" });
+  });
+
+  // Auth routes for both systems
+  app.get('/api/auth/user', async (req: AuthRequest, res) => {
+    try {
+      // Try custom auth first
+      const authHeader = req.headers.authorization;
+      const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : req.cookies?.token;
+      
+      if (token) {
+        // Custom auth
+        const decoded = require('./customAuth').verifyToken(token);
+        if (decoded) {
+          const user = await storage.getUser(decoded.userId);
+          if (user) {
+            return res.json(user);
+          }
+        }
+      }
+
+      // Fallback to Replit auth
+      if (req.isAuthenticated && req.isAuthenticated()) {
+        const userId = (req.user as any)?.claims?.sub;
+        if (userId) {
+          const user = await storage.getUser(userId);
+          return res.json(user);
+        }
+      }
+
+      res.status(401).json({ message: "Unauthorized" });
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
