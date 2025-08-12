@@ -10,7 +10,8 @@ import {
   insertMessageSchema,
   insertMatrimonyProfileSchema,
   insertJobSchema,
-  insertBusinessSchema
+  insertBusinessSchema,
+  insertAnnouncementSchema
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -442,6 +443,97 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error contacting business:", error);
       res.status(500).json({ message: "Failed to contact business" });
+    }
+  });
+
+  // Announcements routes
+  app.get('/api/announcements', async (req, res) => {
+    try {
+      const announcements = await storage.getActiveAnnouncements();
+      res.json({ data: announcements });
+    } catch (error) {
+      console.error("Error fetching announcements:", error);
+      res.status(500).json({ message: "Failed to fetch announcements" });
+    }
+  });
+
+  app.get('/api/announcements/all', isAuthenticated, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user.claims.sub);
+      
+      // Only admins and moderators can view all announcements
+      if (user?.userType !== 'admin' && user?.userType !== 'moderator') {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const announcements = await storage.getAnnouncements();
+      res.json({ data: announcements });
+    } catch (error) {
+      console.error("Error fetching all announcements:", error);
+      res.status(500).json({ message: "Failed to fetch announcements" });
+    }
+  });
+
+  app.post('/api/announcements', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      // Only admins and moderators can create announcements
+      if (user?.userType !== 'admin' && user?.userType !== 'moderator') {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const validation = insertAnnouncementSchema.safeParse({ ...req.body, authorId: userId });
+      
+      if (!validation.success) {
+        return res.status(400).json({ message: "Invalid announcement data", errors: validation.error.issues });
+      }
+
+      const announcement = await storage.createAnnouncement(validation.data);
+      res.json({ data: announcement, message: "Announcement created successfully" });
+    } catch (error) {
+      console.error("Error creating announcement:", error);
+      res.status(500).json({ message: "Failed to create announcement" });
+    }
+  });
+
+  app.put('/api/announcements/:announcementId', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      const { announcementId } = req.params;
+      
+      // Only admins and moderators can update announcements
+      if (user?.userType !== 'admin' && user?.userType !== 'moderator') {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const updates = req.body;
+      const announcement = await storage.updateAnnouncement(announcementId, updates);
+      res.json({ data: announcement, message: "Announcement updated successfully" });
+    } catch (error) {
+      console.error("Error updating announcement:", error);
+      res.status(500).json({ message: "Failed to update announcement" });
+    }
+  });
+
+  app.delete('/api/announcements/:announcementId', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      const { announcementId } = req.params;
+      
+      // Only admins and moderators can delete announcements
+      if (user?.userType !== 'admin' && user?.userType !== 'moderator') {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      await storage.deleteAnnouncement(announcementId, userId);
+      res.json({ message: "Announcement deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting announcement:", error);
+      res.status(500).json({ message: "Failed to delete announcement" });
     }
   });
 

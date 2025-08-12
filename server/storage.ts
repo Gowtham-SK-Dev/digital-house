@@ -14,6 +14,7 @@ import {
   businesses,
   jobApplications,
   matrimonyInterests,
+  announcements,
   type User,
   type UpsertUser,
   type Post,
@@ -32,6 +33,8 @@ import {
   type InsertJob,
   type Business,
   type InsertBusiness,
+  type Announcement,
+  type InsertAnnouncement,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, or, like, sql, count } from "drizzle-orm";
@@ -94,6 +97,13 @@ export interface IStorage {
   getBusinessCategories(): Promise<string[]>;
   createBusiness(business: InsertBusiness): Promise<Business>;
   contactBusiness(businessId: string, userId: string, message: string): Promise<void>;
+  
+  // Announcements operations
+  createAnnouncement(announcement: InsertAnnouncement): Promise<Announcement>;
+  getAnnouncements(): Promise<Announcement[]>;
+  getActiveAnnouncements(): Promise<Announcement[]>;
+  updateAnnouncement(id: string, updates: Partial<Announcement>): Promise<Announcement>;
+  deleteAnnouncement(id: string, userId: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -636,6 +646,98 @@ export class DatabaseStorage implements IStorage {
         content: `Business Contact Request: ${message}`,
       });
     }
+  }
+
+  // Announcements operations
+  async createAnnouncement(announcement: InsertAnnouncement): Promise<Announcement> {
+    const [newAnnouncement] = await db
+      .insert(announcements)
+      .values(announcement)
+      .returning();
+    return newAnnouncement;
+  }
+
+  async getAnnouncements(): Promise<Announcement[]> {
+    const announcementsList = await db
+      .select({
+        id: announcements.id,
+        authorId: announcements.authorId,
+        title: announcements.title,
+        content: announcements.content,
+        priority: announcements.priority,
+        isActive: announcements.isActive,
+        isPinned: announcements.isPinned,
+        expiresAt: announcements.expiresAt,
+        createdAt: announcements.createdAt,
+        updatedAt: announcements.updatedAt,
+        author: {
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImageUrl: users.profileImageUrl,
+          userType: users.userType,
+        }
+      })
+      .from(announcements)
+      .innerJoin(users, eq(announcements.authorId, users.id))
+      .orderBy(desc(announcements.isPinned), desc(announcements.createdAt));
+    
+    return announcementsList as any[];
+  }
+
+  async getActiveAnnouncements(): Promise<Announcement[]> {
+    const activeAnnouncements = await db
+      .select({
+        id: announcements.id,
+        authorId: announcements.authorId,
+        title: announcements.title,
+        content: announcements.content,
+        priority: announcements.priority,
+        isActive: announcements.isActive,
+        isPinned: announcements.isPinned,
+        expiresAt: announcements.expiresAt,
+        createdAt: announcements.createdAt,
+        updatedAt: announcements.updatedAt,
+        author: {
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImageUrl: users.profileImageUrl,
+          userType: users.userType,
+        }
+      })
+      .from(announcements)
+      .innerJoin(users, eq(announcements.authorId, users.id))
+      .where(
+        and(
+          eq(announcements.isActive, true),
+          or(
+            sql`${announcements.expiresAt} IS NULL`,
+            sql`${announcements.expiresAt} > NOW()`
+          )
+        )
+      )
+      .orderBy(desc(announcements.isPinned), desc(announcements.createdAt));
+    
+    return activeAnnouncements as any[];
+  }
+
+  async updateAnnouncement(id: string, updates: Partial<Announcement>): Promise<Announcement> {
+    const [updatedAnnouncement] = await db
+      .update(announcements)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(announcements.id, id))
+      .returning();
+    return updatedAnnouncement;
+  }
+
+  async deleteAnnouncement(id: string, userId: string): Promise<void> {
+    await db
+      .delete(announcements)
+      .where(
+        and(
+          eq(announcements.id, id),
+          eq(announcements.authorId, userId)
+        )
+      );
   }
 }
 

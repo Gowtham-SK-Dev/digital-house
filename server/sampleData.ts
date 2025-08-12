@@ -397,6 +397,60 @@ export async function createSampleData() {
       await storage.createBusiness(business);
     }
 
+    // Sample announcements
+    const sampleAnnouncements = [
+      {
+        authorId: "sample-user-5",
+        title: "Welcome to Digital House Community Platform!",
+        content: "வணக்கம் (Vanakkam) everyone! Welcome to our new Digital House community platform. This is your space to connect with Tamil diaspora members worldwide, share experiences, seek help, and build meaningful relationships. Please take a moment to complete your profile and explore the various features available.",
+        priority: "high" as const,
+        isActive: true,
+        isPinned: true,
+        expiresAt: null,
+      },
+      {
+        authorId: "sample-user-5",
+        title: "Community Guidelines and Code of Conduct",
+        content: "To maintain a respectful and inclusive environment for all members, please familiarize yourself with our community guidelines:\n\n1. Treat all members with respect and kindness\n2. No hate speech, discrimination, or harassment\n3. Share authentic information and avoid spam\n4. Help others when possible and seek help when needed\n5. Celebrate our Tamil culture while being inclusive\n\nViolations may result in account suspension. Let's build a supportive community together!",
+        priority: "medium" as const,
+        isActive: true,
+        isPinned: true,
+        expiresAt: null,
+      },
+      {
+        authorId: "sample-user-5",
+        title: "Upcoming Tamil New Year Celebrations 2024",
+        content: "Get ready to celebrate Tamil New Year (Puthandu) on April 14th! We're organizing virtual and in-person celebrations across multiple cities:\n\n🌟 San Francisco: Cultural program at Tamil Association\n🌟 Toronto: Community feast and performances\n🌟 London: Online celebration with cultural activities\n🌟 Sydney: Beach gathering and traditional games\n\nRegister through the Events section. Let's make this year's celebration memorable!",
+        priority: "medium" as const,
+        isActive: true,
+        isPinned: false,
+        expiresAt: new Date("2024-04-20T00:00:00Z"),
+      },
+      {
+        authorId: "sample-user-5",
+        title: "Version 2.0 Features Now Available!",
+        content: "Exciting news! Version 2.0 of Digital House is now live with enhanced features:\n\n✨ AI-Powered Matrimony Matching\n✨ Comprehensive Jobs Portal\n✨ Business Networking Hub\n\nSwitch to Version 2.0 from your profile menu to access these new features. Current Version 1.0 users can continue using the classic experience or upgrade anytime.",
+        priority: "high" as const,
+        isActive: true,
+        isPinned: false,
+        expiresAt: new Date("2024-03-31T00:00:00Z"),
+      },
+      {
+        authorId: "sample-user-5",
+        title: "Emergency Contact Network Activated",
+        content: "Due to recent global events, we've activated our emergency contact network. Community members in affected areas, please check in and let us know you're safe. Others can offer assistance through the Help Desk.\n\nEmergency coordinators:\n- North America: Priya (+1-555-HELP)\n- Europe: Dr. Meera (+44-EMERGENCY)\n- Asia-Pacific: Contact local representatives\n\nStay safe, everyone!",
+        priority: "urgent" as const,
+        isActive: true,
+        isPinned: false,
+        expiresAt: new Date("2024-02-28T00:00:00Z"),
+      }
+    ];
+
+    // Create sample announcements
+    for (const announcement of sampleAnnouncements) {
+      await storage.createAnnouncement(announcement);
+    }
+
     console.log("✅ Sample data created successfully!");
     console.log("Created:");
     console.log(`- ${sampleUsers.length} users`);
@@ -406,6 +460,7 @@ export async function createSampleData() {
     console.log(`- ${sampleMatrimonyProfiles.length} matrimony profiles`);
     console.log(`- ${sampleJobs.length} jobs`);
     console.log(`- ${sampleBusinesses.length} businesses`);
+    console.log(`- ${sampleAnnouncements.length} announcements`);
 
   } catch (error) {
     console.error("Error creating sample data:", error);

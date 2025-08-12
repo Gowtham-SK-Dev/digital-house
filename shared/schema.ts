@@ -34,6 +34,7 @@ export const connectionStatusEnum = pgEnum('connection_status', ['pending', 'acc
 export const helpRequestStatusEnum = pgEnum('help_request_status', ['active', 'resolved', 'closed']);
 export const helpRequestTypeEnum = pgEnum('help_request_type', ['medical', 'travel', 'safety', 'other']);
 export const eventStatusEnum = pgEnum('event_status', ['upcoming', 'ongoing', 'completed', 'cancelled']);
+export const announcementPriorityEnum = pgEnum('announcement_priority', ['low', 'medium', 'high', 'urgent']);
 
 // Users table
 export const users = pgTable("users", {
@@ -349,6 +350,20 @@ export const matrimonyInterests = pgTable("matrimony_interests", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Announcements table
+export const announcements = pgTable("announcements", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  authorId: varchar("author_id").references(() => users.id).notNull(),
+  title: varchar("title").notNull(),
+  content: text("content").notNull(),
+  priority: announcementPriorityEnum("priority").default('medium').notNull(),
+  isActive: boolean("is_active").default(true),
+  isPinned: boolean("is_pinned").default(false),
+  expiresAt: timestamp("expires_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -408,6 +423,12 @@ export const insertBusinessSchema = createInsertSchema(businesses).omit({
   reviewsCount: true,
 });
 
+export const insertAnnouncementSchema = createInsertSchema(announcements).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type UpsertUser = typeof users.$inferInsert;
@@ -428,3 +449,5 @@ export type Job = typeof jobs.$inferSelect;
 export type InsertJob = z.infer<typeof insertJobSchema>;
 export type Business = typeof businesses.$inferSelect;
 export type InsertBusiness = z.infer<typeof insertBusinessSchema>;
+export type Announcement = typeof announcements.$inferSelect;
+export type InsertAnnouncement = z.infer<typeof insertAnnouncementSchema>;
