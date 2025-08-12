@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertTriangle, Megaphone, Pin, Calendar, User, Plus, Edit, Trash2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
 
@@ -56,13 +56,15 @@ export default function Announcements() {
 
   const createMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest("/api/announcements", {
+      const response = await fetch("/api/announcements", {
         method: "POST",
         body: JSON.stringify(newAnnouncement),
         headers: {
           'Content-Type': 'application/json',
         },
       });
+      if (!response.ok) throw new Error('Failed to create announcement');
+      return response.json();
     },
     onSuccess: () => {
       toast({
@@ -84,7 +86,7 @@ export default function Announcements() {
 
   const updateMutation = useMutation({
     mutationFn: async (announcement: Announcement) => {
-      await apiRequest(`/api/announcements/${announcement.id}`, {
+      const response = await fetch(`/api/announcements/${announcement.id}`, {
         method: "PUT",
         body: JSON.stringify({
           title: announcement.title,
@@ -98,6 +100,8 @@ export default function Announcements() {
           'Content-Type': 'application/json',
         },
       });
+      if (!response.ok) throw new Error('Failed to update announcement');
+      return response.json();
     },
     onSuccess: () => {
       toast({
@@ -112,9 +116,11 @@ export default function Announcements() {
 
   const deleteMutation = useMutation({
     mutationFn: async (announcementId: string) => {
-      await apiRequest(`/api/announcements/${announcementId}`, {
+      const response = await fetch(`/api/announcements/${announcementId}`, {
         method: "DELETE",
       });
+      if (!response.ok) throw new Error('Failed to delete announcement');
+      return response.json();
     },
     onSuccess: () => {
       toast({
