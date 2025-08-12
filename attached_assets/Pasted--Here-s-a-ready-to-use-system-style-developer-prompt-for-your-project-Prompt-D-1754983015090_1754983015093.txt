@@ -1,0 +1,400 @@
+
+Here’s a **ready-to-use system-style developer prompt** for your project:
+
+---
+
+## **Prompt: Digital House — Community Networking Platform**
+
+> You are an expert full-stack architect and TypeScript developer.
+> Your task is to build a modular, scalable, maintainable **community-based social networking platform** called **Digital House**.
+>
+> **Tech Stack**:
+>
+> * **Backend**: Node.js + Express + TypeScript + MySQL (with Prisma ORM)
+> * **Frontend (Web)**: React.js with TypeScript, TailwindCSS for styling
+> * **Frontend (Mobile)**: React Native (TypeScript)
+> * **Auth**: JWT access/refresh tokens + phone/email OTP verification
+> * **Storage**: AWS S3 (for profile pictures, media uploads)
+> * **Realtime**: Socket.IO (for chat and notifications)
+>
+> **Architecture Guidelines**:
+>
+> 1. Follow **modular domain-based folder structure** (`/modules/auth`, `/modules/users`, `/modules/posts`, etc.).
+> 2. Each module must contain:
+>
+>    * `controller.ts` — handles HTTP requests/responses
+>    * `service.ts` — contains business logic
+>    * `repository.ts` — database queries (via Prisma)
+>    * `routes.ts` — defines Express routes
+>    * `types.ts` — shared type definitions
+> 3. Implement **input validation** using `zod`.
+> 4. Implement **error handling middleware** (`error.middleware.ts`) and **auth middleware** (`auth.middleware.ts`).
+> 5. Implement a **config system** for environment variables (`config.ts`).
+> 6. Use **ESLint + Prettier** for code consistency.
+> 7. All database tables should follow **normalized schema** and support future extension.
+> 8. Write **unit tests** with Jest + Supertest for controllers and services.
+>
+> **Core Features for MVP**:
+>
+> * **Auth Module**: register, login, refresh token, mail OTP verification
+> * **User Profiles Module**: CRUD, profile picture upload (S3)
+> * **Connections Module**: send/accept friend requests, list friends
+> * **Posts Module**: create, read, delete posts (text + media), like/unlike
+> * **Groups & Events Module**: group creation, joining, event RSVPs
+> * **Notifications Module**: in-app + push notifications
+>
+> **API Guidelines**:
+>
+> * Use `/api/v1/...` prefix
+> * Return JSON `{ data: ..., message: ..., errors: ... }`
+> * Paginate large results (`limit` + `offset` params)
+>
+> **Development Workflow**:
+>
+> * First, generate **Prisma schema** for MySQL based on these modules.
+> * Then generate **Express routes, controllers, and services** for each module.
+> * Finally, scaffold **React frontend** with matching API integration and state management (React Query).
+>
+> **Your Output**:
+>
+> * Full code files (backend + frontend) following the above guidelines.
+> * Include comments explaining architecture decisions.
+> * Write database migrations and seed scripts.
+> * Provide an example `.env` file.
+
+---
+
+If you paste this into ChatGPT (with Code Interpreter disabled, using GPT-4 or GPT-5), it will keep generating code in the **exact structure** you want, module by module.
+
+I can now **customize this prompt further** so it also includes **step-by-step task breakdown** for each module, making it act like a full **AI development assistant** that builds the app in sprints.
+
+Do you want me to make that **step-by-step enhanced prompt** next? That would make it much easier to manage the build.
+
+
+
+
+
+
+
+
+
+## **Prompt: Digital House — Extended Business & Functional Workflow**
+
+> You are an experienced **product manager and system architect**.
+> Your task is to design the **business logic, feature workflows, and operational rules** for a **private community-based networking platform** called **Digital House**.
+>
+> ---
+>
+> ### **Business Context**
+>
+> * Exclusive to members of a specific Indian community (with members across India & abroad).
+> * Goal: **Reconnect members**, preserve culture, enable collaboration, and provide safe, private interaction.
+> * Platforms: Web (React.js) + Mobile App (React Native).
+> * Phase 1: Core networking & engagement.
+> * Phase 2+: Advanced modules (Real-time help, Jobs, Matrimony, Business networking).
+> * Monetization: Premium directory listings, event ticketing, job ads, matrimony plans, sponsorships.
+>
+> ---
+>
+> ### **User Roles**
+>
+> 1. **Member** — regular user, can post, connect, join groups, access community tools.
+> 2. **Moderator** — manages posts, handles reports, verifies jobs/matrimony listings.
+> 3. **Admin** — full system control, analytics, monetization management.
+>
+> ---
+>
+> ### **Core Features & Business Flow**
+>
+> #### **1. Onboarding**
+>
+> * Sign up with email OTP.
+> * Profile completion: Name, DOB, Native place, Natchathiram, Kulam, occupation.
+> * Profile photo upload.
+> * Optional admin approval for closed registrations.
+>
+> #### **2. Member Directory**
+>
+> * Search by name, location, native place, profession.
+> * Privacy controls for sensitive info.
+>
+> #### **3. News Feed**
+>
+> * Community-wide or group-specific posts.
+> * Text, image, video posts.
+> * Like, comment, share, report.
+>
+> #### **4. Groups**
+>
+> * Public/private groups by interest, location, or purpose.
+> * File sharing, discussions, event hosting.
+>
+> #### **5. Events**
+>
+> * Create & manage events (free or paid).
+> * RSVP system + push reminders.
+>
+> #### **6. Messaging**
+>
+> * 1:1 chat, group chat.
+> * Media & document sharing.
+>
+> ---
+>
+> ### **Advanced Features**
+>
+> #### **7. Real-Time Help / SOS**
+>
+> * Emergency help button in app.
+> * Broadcasts help request to verified members nearby.
+> * Option for categories: Medical, Safety, Lost & Found.
+> * Integration with police/ambulance hotlines (optional).
+>
+> #### **8. Business Room**
+>
+> * Separate networking space for businesses & service providers.
+> * Members can showcase products/services.
+> * Option for live video presentations or webinars.
+> * B2B connections: Request quotes, proposals.
+> * Paid premium business listing plans.
+>
+> #### **9. Jobs & Careers**
+>
+> * Job listings posted by members/companies.
+> * Filter by location, skill, experience.
+> * Resume upload & direct apply option.
+> * Recruiter dashboard for managing applicants.
+> * Premium listing boosts.
+>
+> #### **10. Matrimony**
+>
+> * Dedicated matrimony profile type.
+> * Search/filter by community-specific parameters (kulam, natchathiram, location, education, profession).
+> * Privacy & contact request approval system.
+> * Subscription model for unlimited contact views.
+>
+> ---
+>
+> ### **Notifications**
+>
+> * Push + in-app alerts for: friend requests, job matches, matrimony matches, event reminders, business offers, help requests.
+>
+> ---
+>
+> ### **Moderation & Safety**
+>
+> * Content reporting & review.
+> * Verified badge for trusted businesses & job posters.
+> * Matrimony verification for authenticity.
+>
+> ---
+>
+> ### **Admin Dashboard**
+>
+> * User analytics, job/matrimony stats, SOS logs, business engagement.
+> * Monetization reports.
+> * Moderator tools for content & member management.
+>
+> ---
+>
+> ### **User Journey Example (Extended)**
+>
+> 1. User signs up via mobile OTP, completes profile.
+> 2. Joins “Chennai Professionals” group, connects with members.
+> 3. Browses **Jobs** and applies for a local IT position.
+> 4. Lists their catering business in **Business Room**, gets inquiries.
+> 5. Receives a matrimony match suggestion, sends a request.
+> 6. At night, sees an SOS alert from someone nearby and offers help.
+>
+> ---
+>
+> ### **Data Flow**
+>
+> * **Input**: User actions (signup, post, SOS, job listing, matrimony search).
+> * **Processing**: Verification, privacy rules, relevance filters.
+> * **Output**: Feed updates, matches, notifications, analytics.
+>
+> ---
+---
+---
+
+## **Prompt: Digital House — Full Business & Feature Workflow**
+
+You are designing and developing a **community-exclusive social networking ecosystem** called **Digital House**.
+The platform should be **modular, scalable, and secure**, and should bring together members of a specific Indian community living in India and abroad.
+It should allow **personal, professional, and cultural engagement** through multiple dedicated feature modules.
+
+---
+
+### **1. Business Objective**
+
+The purpose of **Digital House** is to:
+
+* Reconnect community members globally.
+* Provide spaces for **personal networking**, **business promotion**, **job opportunities**, **matrimony**, and **real-time help requests**.
+* Promote **cultural events, education, and entrepreneurship**.
+* Enable both **social interactions** and **professional growth**.
+
+---
+
+### **2. Target Users**
+
+* **Individual Members** — community people looking for friends, networking, or matrimonial matches.
+* **Business Owners** — promoting products/services inside the community.
+* **Employers/Job Seekers** — posting and applying for jobs.
+* **Community Leaders** — organizing events and announcements.
+* **Support Volunteers** — responding to real-time help requests.
+
+---
+
+### **3. Platform Structure**
+
+#### **Core Modules**
+
+1. **Authentication & Onboarding**
+
+   * OTP-based email login.
+   * Role-based registration (Individual / Business / Organization).
+   * KYC verification (optional for trust badge).
+
+2. **User Profiles**
+
+   * Personal Info (Name, Location, About, Education, Work).
+   * Profile Picture & Cover Image.
+   * Visibility settings (Public, Friends, Private).
+
+3. **Friends & Connections**
+
+   * Send/accept friend requests.
+   * Follow/unfollow functionality.
+   * Suggested connections based on location, interests, or mutual friends.
+
+4. **News Feed**
+
+   * Text/image/video posts.
+   * Like, comment, share.
+   * Trending hashtags.
+
+5. **Private & Group Chat**
+
+   * One-to-one messaging.
+   * Group chat for friends, interest groups, or business teams.
+   * Read receipts, typing indicators.
+
+---
+
+#### **Extra Feature Modules**
+
+6. **Real-Time Help Desk**
+
+   * Users can post urgent help requests (medical emergency, travel assistance, etc.).
+   * Nearby members get instant push notifications.
+   * A “Volunteer Respond” button for quick action.
+
+7. **Business Rooms**
+
+   * Community businesses can create a **Business Page**.
+   * Showcase products, post offers, take inquiries.
+   * Business-to-business networking.
+   * Premium plans for priority listings.
+
+8. **Jobs Portal**
+
+   * Employers can post job openings.
+   * Members can apply directly or connect with the recruiter.
+   * Filters by category, location, and skills.
+
+9. **Matrimony**
+
+   * Dedicated section for marriage profiles.
+   * Family-managed or self-managed profiles.
+   * Privacy-controlled profile viewing.
+   * Match suggestions based on preferences.
+
+10. **Events & Activities**
+
+    * Create and promote community events.
+    * RSVP system for attendees.
+    * Ticket booking (free or paid).
+
+11. **Learning & Resources (Optional Future Expansion)**
+
+    * Courses, workshops, cultural education.
+    * Mentorship programs.
+
+---
+
+### **4. Monetization Opportunities**
+
+* **Premium Business Listings**
+* **Featured Matrimony Profiles**
+* **Event Sponsorship**
+* **Job Posting Packages**
+* **In-App Ads (limited, community-friendly)**
+
+---
+
+### **5. Workflow Example — Real-Time Help Module**
+
+1. User posts a help request → selects type (Medical / Travel / Other).
+2. System identifies nearby members from the database.
+3. Sends **push notifications** via WebSockets/FCM.
+4. Volunteers can respond in-app.
+5. Help status updated and visible to relevant members.
+
+---
+
+### **6. Development Roadmap**
+
+#### **Phase 1 (MVP)**
+
+* Auth & Profiles
+* Friends/Connections
+* News Feed
+* Chat
+* Real-Time Help Desk
+
+#### **Phase 2**
+
+* Business Rooms
+* Jobs Portal
+* Events & Activities
+
+#### **Phase 3**
+
+* Matrimony
+* Learning & Resources
+* Advanced AI Recommendations (friend matches, job matches, business matches)
+
+---
+
+### **7. Technical Guidelines**
+
+* **Backend**: Node.js + Express + TypeScript + MySQL (Prisma ORM)
+* **Frontend**:
+
+  * Web: React.js + TypeScript + TailwindCSS
+  * Mobile: React Native + TypeScript
+* **Realtime**: Socket.IO + Firebase Cloud Messaging
+* **Storage**: AWS S3 for images/videos
+* **Search**: ElasticSearch for jobs, matrimony, and businesses
+* **Security**: JWT auth, rate limiting, input validation with Zod
+* **APIs**: REST with `/api/v1/...` namespace
+* **Testing**: Jest + Supertest
+
+---
+
+### **8. Expected Output from AI/Development Team**
+
+* Complete database schema.
+* Backend code for each module (controller, service, repository).
+* Frontend pages/screens with API integration.
+* Deployment instructions (Docker + CI/CD).
+* Example `.env` and seed data.
+
+---
+
+If we want, I can now **expand this into a fully connected process flow diagram** for all these modules, showing how a user moves between features — so your team/AI will know **exactly** how the app flows from login to engagement.
+
+Do you want me to make that **process flow map** next? That would make your app’s workflow crystal clear before coding starts.
+

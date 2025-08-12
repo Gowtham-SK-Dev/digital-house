@@ -1,0 +1,153 @@
+The purpose of **Digital House** is to:
+
+* Reconnect community members globally.
+* Provide spaces for **personal networking**, **business promotion**, **job opportunities**, **matrimony**, and **real-time help requests**.
+* Promote **cultural events, education, and entrepreneurship**.
+* Enable both **social interactions** and **professional growth**.
+
+---
+
+### **2. Target Users**
+
+* **Individual Members** — community people looking for friends, networking, or matrimonial matches.
+* **Business Owners** — promoting products/services inside the community.
+* **Employers/Job Seekers** — posting and applying for jobs.
+* **Community Leaders** — organizing events and announcements.
+* **Support Volunteers** — responding to real-time help requests.
+
+---
+
+### **3. Platform Structure**
+
+#### **Core Modules**
+
+1. **Authentication & Onboarding**
+
+   * OTP-based email login.
+   * Role-based registration (Individual / Business / Organization).
+   * KYC verification (optional for trust badge).
+
+2. **User Profiles**
+
+   * Personal Info (Name, Location, About, Education, Work).
+   * Profile Picture & Cover Image.
+   * Visibility settings (Public, Friends, Private).
+
+3. **Friends & Connections**
+
+   * Send/accept friend requests.
+   * Follow/unfollow functionality.
+   * Suggested connections based on location, interests, or mutual friends.
+
+4. **News Feed**
+
+   * Text/image/video posts.
+   * Like, comment, share.
+   * Trending hashtags.
+
+5. **Private & Group Chat**
+
+   * One-to-one messaging.
+   * Group chat for friends, interest groups, or business teams.
+   * Read receipts, typing indicators.
+
+
+6. **Real-Time Help Desk**
+
+   * Users can post urgent help requests (medical emergency, travel assistance, etc.).
+   * Nearby members get instant push notifications.
+   * A “Volunteer Respond” button for quick action.
+
+7. **Business Rooms**
+
+   * Community businesses can create a **Business Page**.
+   * Showcase products, post offers, take inquiries.
+   * Business-to-business networking.
+   * Premium plans for priority listings.
+
+8. **Jobs Portal**
+
+   * Employers can post job openings.
+   * Members can apply directly or connect with the recruiter.
+   * Filters by category, location, and skills.
+
+9. **Matrimony**
+
+   * Dedicated section for marriage profiles.
+   * Family-managed or self-managed profiles.
+   * Privacy-controlled profile viewing.
+   * Match suggestions based on preferences.
+
+10. **Events & Activities**
+
+    * Create and promote community events.
+    * RSVP system for attendees.
+    * Ticket booking (free or paid).
+
+11. **Learning & Resources (Optional Future Expansion)**
+
+    * Courses, workshops, cultural education.
+    * Mentorship programs.
+
+
+
+---
+
+### **5. Workflow Example — Real-Time Help Module**
+
+1. User posts a help request → selects type (Medical / Travel / Other).
+2. System identifies nearby members from the database.
+3. Sends **push notifications** via WebSockets/FCM.
+4. Volunteers can respond in-app.
+5. Help status updated and visible to relevant members.
+
+---
+
+### **6. Development Roadmap**
+
+#### **Phase 1 (MVP)**
+
+* Auth & Profiles
+* Friends/Connections
+* News Feed
+* Chat
+* Real-Time Help Desk
+
+#### **Phase 2**
+
+* Business Rooms
+* Jobs Portal
+* Events & Activities
+
+#### **Phase 3**
+
+* Matrimony
+* Learning & Resources
+* Advanced AI Recommendations (friend matches, job matches, business matches)
+
+---
+
+### **7. Technical Guidelines**
+
+* **Backend**: Node.js + Express + TypeScript + MySQL (Prisma ORM)
+* **Frontend**:
+
+  * Web: React.js + TypeScript + TailwindCSS
+  * Mobile: React Native + TypeScript
+* **Realtime**: Socket.IO + Firebase Cloud Messaging
+* **Storage**: AWS S3 for images/videos
+* **Search**: ElasticSearch for jobs, matrimony, and businesses
+* **Security**: JWT auth, rate limiting, input validation with Zod
+* **APIs**: REST with `/api/v1/...` namespace
+* **Testing**: Jest + Supertest
+
+---
+
+### **8. Expected Output from AI/Development Team**
+
+* Complete database schema.
+* Backend code for each module (controller, service, repository).
+* Frontend pages/screens with API integration.
+* Deployment instructions (Docker + CI/CD).
+* Example `.env` and seed data.
+
