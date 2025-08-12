@@ -39,30 +39,35 @@ export default function Home() {
   }, [isAuthenticated, authLoading, toast]);
 
   // Fetch data for home page
-  const { data: posts, isLoading: postsLoading } = useQuery<Post[]>({
+  const { data: postsData, isLoading: postsLoading } = useQuery<{data: Post[]}>({
     queryKey: ["/api/posts"],
     retry: false,
   });
+  const posts = postsData?.data || [];
 
-  const { data: events } = useQuery<Event[]>({
+  const { data: eventsData } = useQuery<{data: Event[]}>({
     queryKey: ["/api/events"],
     retry: false,
   });
+  const events = eventsData?.data || [];
 
-  const { data: helpRequests } = useQuery<HelpRequest[]>({
+  const { data: helpRequestsData } = useQuery<{data: HelpRequest[]}>({
     queryKey: ["/api/help-requests"],
     retry: false,
   });
+  const helpRequests = helpRequestsData?.data || [];
 
-  const { data: jobs } = useQuery<Job[]>({
+  const { data: jobsData } = useQuery<{data: Job[]}>({
     queryKey: ["/api/jobs"],
     retry: false,
   });
+  const jobs = jobsData?.data || [];
 
-  const { data: businesses } = useQuery<Business[]>({
+  const { data: businessesData } = useQuery<{data: Business[]}>({
     queryKey: ["/api/businesses"],
     retry: false,
   });
+  const businesses = businessesData?.data || [];
 
   // Create post mutation
   const createPostMutation = useMutation({
@@ -147,15 +152,15 @@ export default function Home() {
                 {/* Live Community Pulse */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                   <div className="bg-white bg-opacity-15 rounded-lg p-3 text-center backdrop-blur-sm">
-                    <div className="text-2xl font-bold">{posts?.length || 0}</div>
+                    <div className="text-2xl font-bold">{posts.length}</div>
                     <div className="text-sm opacity-90">Posts Today</div>
                   </div>
                   <div className="bg-white bg-opacity-15 rounded-lg p-3 text-center backdrop-blur-sm">
-                    <div className="text-2xl font-bold">{helpRequests?.filter(req => req.status === 'active').length || 0}</div>
+                    <div className="text-2xl font-bold">{helpRequests.filter(req => req.status === 'active').length}</div>
                     <div className="text-sm opacity-90">Help Requests</div>
                   </div>
                   <div className="bg-white bg-opacity-15 rounded-lg p-3 text-center backdrop-blur-sm">
-                    <div className="text-2xl font-bold">{events?.length || 0}</div>
+                    <div className="text-2xl font-bold">{events.length}</div>
                     <div className="text-sm opacity-90">Upcoming Events</div>
                   </div>
                   <div className="bg-white bg-opacity-15 rounded-lg p-3 text-center backdrop-blur-sm">
@@ -258,7 +263,7 @@ export default function Home() {
               </div>
 
               {/* Priority Pinned Items */}
-              {helpRequests && helpRequests.filter(req => req.urgencyLevel >= 4).length > 0 && (
+              {helpRequests.filter(req => req.urgencyLevel && req.urgencyLevel >= 4).length > 0 && (
                 <Card className="mb-4 border-red-200 bg-red-50">
                   <CardHeader className="pb-3">
                     <div className="flex items-center gap-2">
@@ -267,7 +272,7 @@ export default function Home() {
                     </div>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    {helpRequests.filter(req => req.urgencyLevel >= 4).slice(0, 2).map((request) => (
+                    {helpRequests.filter(req => req.urgencyLevel && req.urgencyLevel >= 4).slice(0, 2).map((request) => (
                       <div key={request.id} className="flex items-center justify-between p-3 bg-white rounded-lg mb-2 last:mb-0">
                         <div className="flex-1">
                           <h4 className="font-medium text-red-900">{request.title}</h4>
@@ -299,7 +304,7 @@ export default function Home() {
                     </Card>
                   ))}
                 </div>
-              ) : posts && posts.length > 0 ? (
+              ) : posts.length > 0 ? (
                 <div className="space-y-6">
                   {posts.map((post) => (
                     <PostCard key={post.id} post={post} />
@@ -337,12 +342,12 @@ export default function Home() {
                     Help Board
                   </CardTitle>
                   <Badge variant="secondary" className="bg-orange-100 text-orange-700">
-                    {helpRequests?.filter(req => req.status === 'active').length || 0} Active
+                    {helpRequests.filter(req => req.status === 'active').length} Active
                   </Badge>
                 </div>
               </CardHeader>
               <CardContent className="pt-0 space-y-3">
-                {helpRequests && helpRequests.filter(req => req.status === 'active').slice(0, 3).map((request) => (
+                {helpRequests.filter(req => req.status === 'active').slice(0, 3).map((request) => (
                   <div key={request.id} className="p-3 bg-orange-50 rounded-lg border border-orange-200">
                     <div className="flex items-start justify-between mb-2">
                       <h4 className="font-medium text-orange-900 text-sm line-clamp-1">{request.title}</h4>
@@ -379,12 +384,12 @@ export default function Home() {
                     Business Spotlight
                   </CardTitle>
                   <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-                    {businesses?.length || 0} Active
+                    {businesses.length} Active
                   </Badge>
                 </div>
               </CardHeader>
               <CardContent className="pt-0 space-y-3">
-                {businesses && businesses.slice(0, 3).map((business) => (
+                {businesses.slice(0, 3).map((business) => (
                   <div key={business.id} className="p-3 bg-blue-50 rounded-lg border border-blue-200">
                     <div className="flex items-start space-x-3">
                       <div className="w-8 h-8 bg-blue-200 rounded-lg flex items-center justify-center">
@@ -424,12 +429,12 @@ export default function Home() {
                     Latest Jobs
                   </CardTitle>
                   <Badge variant="secondary" className="bg-green-100 text-green-700">
-                    {jobs?.length || 0} Open
+                    {jobs.length} Open
                   </Badge>
                 </div>
               </CardHeader>
               <CardContent className="pt-0 space-y-3">
-                {jobs && jobs.slice(0, 3).map((job) => (
+                {jobs.slice(0, 3).map((job) => (
                   <div key={job.id} className="p-3 bg-green-50 rounded-lg border border-green-200">
                     <div className="flex items-start justify-between mb-2">
                       <h4 className="font-medium text-green-900 text-sm line-clamp-1">{job.title}</h4>
