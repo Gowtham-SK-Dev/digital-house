@@ -1,0 +1,110 @@
+1. Hero Community Section (Top)
+Purpose: Make every member instantly feel “I belong here, and my community is active”
+
+Dynamic greeting: “Vanakkam Gowtham! Your Digital House is buzzing today 🎉”
+
+Live Community Pulse: A real-time ticker showing:
+
+How many members online now
+
+Number of new posts today
+
+Ongoing help requests
+
+Call-to-action buttons (large & visible):
+
+Share an Update
+
+Ask for Help
+
+Post a Job
+
+Start a Business Room Meeting
+
+2. Central Activity Feed (Heart of the App)
+Purpose: Merge personal updates, professional opportunities, and urgent community needs into one engaging feed.
+
+Post types mixed in feed:
+
+Social: photos, updates, celebrations
+
+Cultural: event announcements, festival photos, traditions
+
+Business: offers, promotions, deals
+
+Jobs: openings, freelancer gigs, internships
+
+Matrimony: “New Matches” short cards
+
+Help: “Urgent: Blood donor needed in Coimbatore” type posts
+
+Priority Pinning: Urgent help requests & important announcements always appear at the top.
+
+3. Community Power Panels (Right Column)
+Purpose: Provide quick access to high-value community resources without leaving homepage.
+
+Real-Time Help Board
+
+Urgent requests sorted by location & category
+
+“I Can Help” button directly on each request
+
+Business Rooms Spotlight
+
+Top 5 active business groups this week
+
+Quick “Join Room” buttons
+
+Jobs Highlights
+
+Latest 5 opportunities from trusted members
+
+“Post Your Job” shortcut
+
+Matrimony Matches
+
+Top suggestions based on preferences
+
+“View More Matches” link
+
+4. Culture & Community Section (Bottom Mid)
+Purpose: Keep heritage and bonding alive alongside modern features.
+
+Festival Calendar (local & global community events)
+
+Story of the Week (member success story, old photos, interviews)
+
+Polls & Discussions (members vote on community initiatives)
+
+Youth & Education (scholarships, study abroad help, competitions)
+
+5. Persistent Action Strip (Always Visible at Bottom on Mobile / Top on Desktop)
+🏠 Home
+
+💬 Chat (Real-time group & personal messaging)
+
+🛠 Help
+
+🏢 Business Rooms
+
+❤️ Matrimony
+
+6. AI-Powered Personalization (Behind the Scenes)
+AI recommends:
+
+People you may know
+
+Relevant job listings
+
+Business collaboration opportunities
+
+Events near you
+
+AI translator for cross-language chat (since members may be across India & abroad)
+
+7. Emotional Layer
+Daily motivational quote or cultural proverb
+
+“Today in Our Community History” facts
+
+Recognition badges for active contributors (“Helping Hand”, “Business Builder”)
