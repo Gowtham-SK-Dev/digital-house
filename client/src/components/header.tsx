@@ -41,7 +41,7 @@ export default function Header() {
   const v2NavItems = [
     { href: "/matrimony", label: "Matrimony" },
     { href: "/jobs", label: "Jobs" },
-    { href: "/business-hub", label: "Business Hub" },
+    { href: "/business", label: "Business Hub" },
   ];
 
   const navItems = currentVersion === 'v2' ? [...baseNavItems, ...v2NavItems] : baseNavItems;
@@ -170,7 +170,6 @@ export default function Header() {
                           }`}
                           data-testid={`mobile-nav-${item.label.toLowerCase().replace(' ', '-')}`}
                         >
-                          {item.icon && <item.icon size={18} />}
                           <span>{item.label}</span>
                         </Link>
                       );

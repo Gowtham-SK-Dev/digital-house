@@ -445,6 +445,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Development-only route to create sample data
+  if (process.env.NODE_ENV === 'development') {
+    app.post('/api/dev/create-sample-data', async (req, res) => {
+      try {
+        const { createSampleData } = await import('./sampleData');
+        await createSampleData();
+        res.json({ message: "Sample data created successfully!" });
+      } catch (error) {
+        console.error("Error creating sample data:", error);
+        res.status(500).json({ message: "Failed to create sample data" });
+      }
+    });
+  }
+
   const httpServer = createServer(app);
   return httpServer;
 }

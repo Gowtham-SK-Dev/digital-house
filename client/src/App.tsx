@@ -26,10 +26,14 @@ function Router() {
     setCurrentVersion(version);
   }, []);
 
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+
   return (
     <Switch>
       <Route path="/version-selector" component={VersionSelector} />
-      {isLoading || !isAuthenticated ? (
+      {!isAuthenticated ? (
         <Route path="/" component={Landing} />
       ) : (
         <>
@@ -39,14 +43,10 @@ function Router() {
           <Route path="/events" component={Events} />
           <Route path="/help-desk" component={HelpDesk} />
           
-          {/* Version 2.0 Features */}
-          {currentVersion === 'v2' && (
-            <>
-              <Route path="/matrimony" component={Matrimony} />
-              <Route path="/jobs" component={Jobs} />
-              <Route path="/business" component={BusinessHub} />
-            </>
-          )}
+          {/* Version 2.0 Features - Always available but show different content based on version */}
+          <Route path="/matrimony" component={Matrimony} />
+          <Route path="/jobs" component={Jobs} />
+          <Route path="/business" component={BusinessHub} />
         </>
       )}
       <Route component={NotFound} />
