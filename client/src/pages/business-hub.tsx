@@ -83,7 +83,7 @@ export default function BusinessHub() {
       business.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       business.services.some(service => service.toLowerCase().includes(searchTerm.toLowerCase()));
     
-    const matchesCategory = !selectedCategory || business.category === selectedCategory;
+    const matchesCategory = !selectedCategory || selectedCategory === 'all' || business.category === selectedCategory;
     const matchesLocation = !selectedLocation || business.location.toLowerCase().includes(selectedLocation.toLowerCase());
     
     return matchesSearch && matchesCategory && matchesLocation;
@@ -195,7 +195,7 @@ export default function BusinessHub() {
                   <SelectValue placeholder="Select Category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value="all">All Categories</SelectItem>
                   {businessCategories.map(category => (
                     <SelectItem key={category} value={category}>{category}</SelectItem>
                   ))}

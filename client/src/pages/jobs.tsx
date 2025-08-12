@@ -78,8 +78,8 @@ export default function Jobs() {
       job.skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesLocation = !selectedLocation || job.location.toLowerCase().includes(selectedLocation.toLowerCase());
-    const matchesType = !selectedType || job.type === selectedType;
-    const matchesLevel = !selectedLevel || job.experienceLevel === selectedLevel;
+    const matchesType = !selectedType || selectedType === 'all' || job.type === selectedType;
+    const matchesLevel = !selectedLevel || selectedLevel === 'all' || job.experienceLevel === selectedLevel;
     
     return matchesSearch && matchesLocation && matchesType && matchesLevel;
   });
@@ -205,7 +205,7 @@ export default function Jobs() {
                   <SelectValue placeholder="Select Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Types</SelectItem>
+                  <SelectItem value="all">All Types</SelectItem>
                   <SelectItem value="full-time">Full Time</SelectItem>
                   <SelectItem value="part-time">Part Time</SelectItem>
                   <SelectItem value="contract">Contract</SelectItem>
@@ -221,7 +221,7 @@ export default function Jobs() {
                   <SelectValue placeholder="Select Level" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Levels</SelectItem>
+                  <SelectItem value="all">All Levels</SelectItem>
                   <SelectItem value="entry">Entry Level</SelectItem>
                   <SelectItem value="mid">Mid Level</SelectItem>
                   <SelectItem value="senior">Senior Level</SelectItem>

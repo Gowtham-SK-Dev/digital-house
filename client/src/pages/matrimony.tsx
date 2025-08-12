@@ -77,7 +77,7 @@ export default function Matrimony() {
       profile.location.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesAge = profile.age >= ageRange.min && profile.age <= ageRange.max;
-    const matchesKulam = !selectedKulam || profile.kulam === selectedKulam;
+    const matchesKulam = !selectedKulam || selectedKulam === 'all' || profile.kulam === selectedKulam;
     const matchesLocation = !selectedLocation || profile.location.includes(selectedLocation);
     
     return matchesSearch && matchesAge && matchesKulam && matchesLocation;
@@ -165,7 +165,7 @@ export default function Matrimony() {
                   <SelectValue placeholder="Select Kulam" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Kulam</SelectItem>
+                  <SelectItem value="all">All Kulam</SelectItem>
                   {kulamOptions.map(kulam => (
                     <SelectItem key={kulam} value={kulam}>{kulam}</SelectItem>
                   ))}
